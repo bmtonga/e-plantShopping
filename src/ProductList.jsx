@@ -286,7 +286,7 @@ function ProductList({ onHomeClick }) {
                 <div style={styleObjUl}>
                     <div><a href="#" onClick={(e) => e.preventDefault()} style={styleA}>Plants</a></div>
                     <div>
-<a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
+                        <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
                             <h1 className='cart'>
                                 <div className="cart-icon-wrap">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68">

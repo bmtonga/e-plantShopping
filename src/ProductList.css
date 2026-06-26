@@ -74,8 +74,8 @@ body {
 
 /* Product Card */
 .product-card {
-    flex: 0 0 calc(33.33% - 20px); /* Adjust width for 3 cards per row with 20px gap */
-    max-width: calc(26.33% - 20px); /* Adjust max-width for 3 cards per row with 20px gap */
+    flex: 0 0 calc(33.33% - 20px); /* 3 cards per row */
+    max-width: calc(33.33% - 20px);
     margin-bottom: 20px;
     padding: 20px;
     background-color: #fff;
