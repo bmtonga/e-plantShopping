@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
+import { useState } from 'react';
 import { removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [checkoutError, setCheckoutError] = useState('');
 
   // Convert cost values like "$15" into a number.
   const parseCost = (cost) => {
@@ -36,7 +39,14 @@ const CartItem = ({ onContinueShopping }) => {
   };
 
   const handleRemove = (item) => {
-    dispatch(removeItem(item.name));
+    if (confirmDelete === item.name) {
+      dispatch(removeItem(item.name));
+      setConfirmDelete(null);
+    } else {
+      setConfirmDelete(item.name);
+      // Auto-cancel confirmation after 3 seconds
+      setTimeout(() => setConfirmDelete(null), 3000);
+    }
   };
 
   // Calculate total cost based on quantity for an item
@@ -44,10 +54,26 @@ const CartItem = ({ onContinueShopping }) => {
     return parseCost(item.cost) * item.quantity;
   };
 
+  // Handle checkout
+  const handleCheckout = () => {
+    if (cart.length === 0) {
+      setCheckoutError('Your cart is empty. Add some plants first!');
+      return;
+    }
+    setCheckoutError('');
+    alert('Thank you for your order! This is a demo, so no actual purchase was made.');
+  };
+
   return (
     <div className="cart-container">
       <h2 style={{ color: 'black' }}>Total Cart Amount: ${calculateTotalAmount()}</h2>
 
+      {cart.length === 0 ? (
+        <div className="empty-cart-message">
+          <p>Your cart is empty!</p>
+          <p>Browse our plants and add some to get started.</p>
+        </div>
+      ) : (
       <div>
         {cart.map((item) => (
           <div className="cart-item" key={item.name}>
@@ -77,23 +103,28 @@ const CartItem = ({ onContinueShopping }) => {
 
               <div className="cart-item-total">Total: ${calculateTotalCost(item)}</div>
 
-              <button className="cart-item-delete" onClick={() => handleRemove(item)}>
-                Delete
+              <button
+                className={`cart-item-delete ${confirmDelete === item.name ? 'confirm' : ''}`}
+                onClick={() => handleRemove(item)}
+                aria-label={confirmDelete === item.name ? `Confirm remove ${item.name}` : `Remove ${item.name}`}
+              >
+                {confirmDelete === item.name ? 'Confirm?' : 'Delete'}
               </button>
             </div>
           </div>
         ))}
       </div>
-
-      <div style={{ marginTop: '20px', color: 'black' }} className="total_cart_amount" />
+      )}
 
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={handleContinueShopping}>
           Continue Shopping
         </button>
-        <br />
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={handleCheckout}>
+          Checkout
+        </button>
       </div>
+      {checkoutError && <div className="checkout-error" role="alert">{checkoutError}</div>}
     </div>
   );
 };

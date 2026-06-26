@@ -4,12 +4,17 @@ import PropTypes from 'prop-types';
 import './ProductList.css';
 
 import CartItem from './CartItem';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addItem } from './CartSlice';
 
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const dispatch = useDispatch();
+    const cartItems = useSelector((state) => state.cart.items);
+    const cartCount = cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    // cartCount is used to render the cart badge in the navbar.
+
+
 
 
     const handleAddToCart = (product) => {
@@ -230,14 +235,15 @@ function ProductList({ onHomeClick }) {
         padding: '15px',
         display: 'flex',
         justifyContent: 'space-between',
-        alignIems: 'center',
+        alignItems: 'center',
         fontSize: '20px',
     }
     const styleObjUl = {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: '1100px',
+        width: '100%',
+        maxWidth: '1100px',
     }
     const styleA = {
         color: 'white',
@@ -255,7 +261,9 @@ function ProductList({ onHomeClick }) {
         setShowCart(true); // Set showCart to true when cart icon is clicked
     };
     const handleContinueShopping = (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
         setShowCart(false);
     };
 
@@ -278,22 +286,25 @@ function ProductList({ onHomeClick }) {
                 <div style={styleObjUl}>
                     <div><a href="#" onClick={(e) => e.preventDefault()} style={styleA}>Plants</a></div>
                     <div>
-                        <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
+<a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
                             <h1 className='cart'>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68">
-                                    <rect width="156" height="156" fill="none"></rect>
-                                    <circle cx="80" cy="216" r="12"></circle>
-                                    <circle cx="184" cy="216" r="12"></circle>
-                                    <path
-                                        d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8"
-                                        fill="none"
-                                        stroke="#faf9f9"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        id="mainIconPathAttribute"
-                                    ></path>
-                                </svg>
+                                <div className="cart-icon-wrap">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68">
+                                        <rect width="156" height="156" fill="none"></rect>
+                                        <circle cx="80" cy="216" r="12"></circle>
+                                        <circle cx="184" cy="216" r="12"></circle>
+                                        <path
+                                            d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8"
+                                            fill="none"
+                                            stroke="#faf9f9"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            id="mainIconPathAttribute"
+                                        ></path>
+                                    </svg>
+                                    <span className="cart-badge" aria-label={`Cart items: ${cartCount}`}>{cartCount}</span>
+                                </div>
                             </h1>
                         </a>
                     </div>
@@ -310,10 +321,11 @@ function ProductList({ onHomeClick }) {
                         <div className="product-list"> {/* Container for the list of plant cards */}
                         {category.plants.map((plant, plantIndex) => ( // Loop through each plant in the current category
                             <div className="product-card" key={plantIndex}> {/* Unique key for each plant card */}
-                            <img 
-                                className="product-image" 
-                                src={plant.image} // Display the plant image
-                                alt={plant.name} // Alt text for accessibility
+                            <img
+                                className="product-image"
+                                src={plant.image}
+                                alt={plant.name}
+                                loading="lazy"
                             />
                             <div className="product-title">{plant.name}</div> {/* Display plant name */}
                             {/* Display other plant details like description and cost */}
@@ -321,7 +333,14 @@ function ProductList({ onHomeClick }) {
                             <div className="product-cost">${plant.cost}</div> {/* Display plant cost */}
                             <button
                                 className="product-button"
-                                onClick={() => handleAddToCart(plant)} // Handle adding plant to cart
+                                onClick={() => handleAddToCart(plant)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleAddToCart(plant);
+                                    }
+                                }}
+                                aria-label={`Add ${plant.name} to cart`}
                             >
                                 Add to Cart
                             </button>
