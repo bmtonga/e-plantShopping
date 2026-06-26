@@ -1,0 +1,7 @@
+- [x] Update `src/CartItem.jsx`:
+  - [x] Remove duplicate imports
+  - [x] Implement `calculateTotalAmount()`
+  - [x] Implement `calculateTotalCost(item)`
+  - [x] Implement `handleContinueShopping(e)` to call `onContinueShopping`
+  - [x] Add robust cost parsing for values like "$15"
+- [ ] Run the dev server and manually verify cart totals + buttons
